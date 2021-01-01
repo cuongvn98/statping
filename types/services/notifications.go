@@ -20,6 +20,7 @@ func UpdateNotifiers() {
 
 func sendSuccess(s *Service) {
 	if !s.AllowNotifications.Bool {
+		log.Infof("Sending notification to: %s is not allowed!", s.Name)
 		return
 	}
 

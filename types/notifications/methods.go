@@ -19,22 +19,23 @@ func (n Notification) LastSentDur() time.Duration {
 }
 
 func (n *Notification) CanSend() bool {
-	if !n.Enabled.Bool {
-		return false
-	}
-	// the last sent notification was past 1 minute (limit per minute)
-	if n.LastSent.Add(60 * time.Minute).Before(utils.Now()) {
-		if n.LastSentCount != 0 {
-			n.LastSentCount--
-		}
-	}
-
-	// dont send if already beyond the notifier's limit
-	if n.LastSentCount >= n.Limits {
-		return false
-	}
-
-	return true
+	return n.Enabled.Bool
+	//if !n.Enabled.Bool {
+	//	return false
+	//}
+	//// the last sent notification was past 1 minute (limit per minute)
+	//if n.LastSent.Add(60 * time.Minute).Before(utils.Now()) {
+	//	if n.LastSentCount != 0 {
+	//		n.LastSentCount--
+	//	}
+	//}
+	//
+	//// dont send if already beyond the notifier's limit
+	//if n.LastSentCount >= n.Limits {
+	//	return false
+	//}
+	//
+	//return true
 }
 
 // GetValue returns the database value of a accept DbField value.

@@ -291,12 +291,12 @@ dockerhub-dev:
 	docker push statping/statping:dev
 
 dockerhub:
-	docker build --build-arg VERSION=${VERSION} -t statping/statping:base --no-cache -f Dockerfile.base .
-	docker build --build-arg VERSION=${VERSION} -t statping/statping:latest --no-cache -f Dockerfile .
-	docker tag statping/statping statping/statping:v${VERSION}
-	docker push statping/statping:base
-	docker push statping/statping:v${VERSION}
-	docker push statping/statping
+	docker build --build-arg VERSION=${VERSION} -t hirosume/statping:base --no-cache -f Dockerfile.base .
+	docker build --build-arg VERSION=${VERSION} -t hirosume/statping:latest --no-cache -f Dockerfile .
+	docker tag hirosume/statping  hirosume/statping:v${VERSION}
+	docker push hirosume/statping:base
+	docker push hirosume/statping:v${VERSION}
+	docker push hirosume/statping
 
 docker-build-dev:
 	docker build --build-arg VERSION=${VERSION} -t statping/statping:latest --no-cache -f Dockerfile .
