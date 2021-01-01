@@ -1,10 +1,11 @@
 package notifications
 
 import (
+	"time"
+
 	"github.com/sirupsen/logrus"
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/utils"
-	"time"
 )
 
 var (
@@ -39,10 +40,10 @@ type Notification struct {
 	Icon        string          `gorm:"-" json:"icon"`
 	Delay       time.Duration   `gorm:"-" json:"delay,string"`
 
-	Form          []NotificationForm `gorm:"-" json:"form"`
-	LastSent      time.Time          `gorm:"-" json:"-"`
-	LastSentCount int                `gorm:"-" json:"-"`
-	Logs          []*NotificationLog `gorm:"-" json:"logs,omitempty"`
+	Form []NotificationForm `gorm:"-" json:"form"`
+	// LastSent      time.Time          `gorm:"-" json:"-"`
+	// LastSentCount int                `gorm:"-" json:"-"`
+	Logs []*NotificationLog `gorm:"-" json:"logs,omitempty"`
 }
 
 type NotificationLog struct {

@@ -2,9 +2,9 @@ package notifications
 
 import (
 	"fmt"
-	"github.com/statping/statping/utils"
 	"strings"
-	"time"
+
+	"github.com/statping/statping/utils"
 )
 
 func (n Notification) Name() string {
@@ -14,9 +14,9 @@ func (n Notification) Name() string {
 }
 
 // LastSent returns a time.Duration of the last sent notification for the notifier
-func (n Notification) LastSentDur() time.Duration {
-	return time.Since(n.LastSent)
-}
+// func (n Notification) LastSentDur() time.Duration {
+// 	return time.Since(n.LastSent)
+// }
 
 func (n *Notification) CanSend() bool {
 	return n.Enabled.Bool

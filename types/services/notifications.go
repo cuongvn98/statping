@@ -39,8 +39,8 @@ func sendSuccess(s *Service) {
 				return
 			}
 			logMessage(notif.Method, out, nil, true, s.Id)
-			notif.LastSentCount++
-			notif.LastSent = utils.Now()
+			// notif.LastSentCount++
+			// notif.LastSent = utils.Now()
 		}
 	}
 
@@ -75,8 +75,8 @@ func sendFailure(s *Service, f *failures.Failure) {
 			}
 			logMessage(notif.Method, out, nil, false, s.Id)
 
-			notif.LastSentCount++
-			notif.LastSent = utils.Now()
+			// notif.LastSentCount++
+			// notif.LastSent = utils.Now()
 		}
 	}
 
