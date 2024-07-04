@@ -1,14 +1,17 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/gorilla/mux"
+
 	"github.com/statping-ng/statping-ng/database"
 	"github.com/statping-ng/statping-ng/types/errors"
 	"github.com/statping-ng/statping-ng/types/failures"
+	"github.com/statping-ng/statping-ng/types/groups"
 	"github.com/statping-ng/statping-ng/types/hits"
 	"github.com/statping-ng/statping-ng/types/services"
 	"github.com/statping-ng/statping-ng/utils"
-	"net/http"
 )
 
 type serviceOrder struct {
@@ -267,8 +270,19 @@ func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiAllServicesHandler(r *http.Request) interface{} {
+	// get group from query
+	group := r.URL.Query().Get("group")
+	if group == "" {
+		return make([]services.Service, 0)
+	}
+
+	gr, err := groups.FindByName(group)
+	if err != nil {
+		return make([]services.Service, 0)
+	}
+
 	var srvs []services.Service
-	for _, v := range services.AllInOrder() {
+	for _, v := range services.AllInGroupOrder(int(gr.Id)) {
 		if !v.Public.Bool && !IsUser(r) {
 			continue
 		}

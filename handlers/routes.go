@@ -6,6 +6,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+
 	"github.com/statping-ng/statping-ng/source"
 	"github.com/statping-ng/statping-ng/types/core"
 	"github.com/statping-ng/statping-ng/utils"
@@ -117,7 +118,7 @@ func Router() *mux.Router {
 	api.Handle("/api/reorder/groups", authenticated(apiGroupReorderHandler, false)).Methods("POST")
 
 	// API SERVICE Routes
-	api.Handle("/api/services", scoped(apiAllServicesHandler)).Methods("GET")
+	api.Handle("/api/services", scoped(apiAllServicesHandler)).Methods("GET") // support to only allow get services from specific group
 	api.Handle("/api/services", authenticated(apiCreateServiceHandler, false)).Methods("POST")
 	api.Handle("/api/services/{id}", scoped(apiServiceHandler)).Methods("GET")
 	api.Handle("/api/reorder/services", authenticated(reorderServiceHandler, false)).Methods("POST")
