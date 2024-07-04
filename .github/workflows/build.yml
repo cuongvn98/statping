@@ -461,7 +461,7 @@ jobs:
   # all other release jobs should be based on this
   release:
     # only run release jobs on push to stable/unstable.
-    if: ${{ success() && fromJSON(needs.data.outputs.is_release) }}
+    if: ${{ fromJSON(needs.data.outputs.is_release) }}
     needs: [ data, build, test-postman-sqlite, test-postman-mysql, test-postman-postgres, docker-build ]
     runs-on: ubuntu-latest
     steps:
