@@ -4,18 +4,20 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
+
 	"github.com/pkg/errors"
+
 	"github.com/statping-ng/statping-ng/handlers"
 	"github.com/statping-ng/statping-ng/source"
 	"github.com/statping-ng/statping-ng/types/configs"
 	"github.com/statping-ng/statping-ng/types/core"
 	"github.com/statping-ng/statping-ng/types/services"
 	"github.com/statping-ng/statping-ng/utils"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-	"strings"
-	"time"
 )
 
 var (
@@ -220,7 +222,7 @@ func onceCli() error {
 	if err := runOnce(); err != nil {
 		return err
 	}
-	//core.CloseDB()
+	// core.CloseDB()
 	fmt.Println("Check is complete.")
 	return nil
 }
@@ -486,7 +488,7 @@ type gitUploader struct {
 
 // ExportChartsJs renders the charts for the index page
 
-//type ExportData struct {
+// type ExportData struct {
 //	Config    *configs.DbConfig   `json:"config"`
 //	Core      *core.Core          `json:"core"`
 //	Services  []services.Service  `json:"services"`
@@ -495,7 +497,7 @@ type gitUploader struct {
 //	Users     []*users.User       `json:"users"`
 //	Groups    []*groups.Group     `json:"groups"`
 //	Notifiers []core.AllNotifiers `json:"notifiers"`
-//}
+// }
 
 // ExportSettings will export a JSON file containing all of the settings below:
 // - Core
@@ -505,7 +507,7 @@ type gitUploader struct {
 // - Services
 // - Groups
 // - Messages
-//func ExportSettings() ([]byte, error) {
+// func ExportSettings() ([]byte, error) {
 //	c, err := core.Select()
 //	if err != nil {
 //		return nil, err
@@ -533,10 +535,10 @@ type gitUploader struct {
 //	}
 //	export, err := json.Marshal(data)
 //	return export, err
-//}
+// }
 
 // ExportIndexHTML returns the HTML of the index page as a string
-//func ExportIndexHTML() []byte {
+// func ExportIndexHTML() []byte {
 //	source.Assets()
 //	core.CoreApp.Connect(core.CoreApp., utils.Directory)
 //	core.SelectAllServices(false)
@@ -548,4 +550,4 @@ type gitUploader struct {
 //	r := httptest.NewRequest("GET", "/", nil)
 //	handlers.ExecuteResponse(w, r, "index.gohtml", nil, nil)
 //	return w.Body.Bytes()
-//}
+// }
