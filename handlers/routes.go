@@ -6,6 +6,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+
 	"github.com/statping-ng/statping-ng/source"
 	"github.com/statping-ng/statping-ng/types/core"
 	"github.com/statping-ng/statping-ng/utils"
@@ -117,26 +118,26 @@ func Router() *mux.Router {
 	api.Handle("/api/reorder/groups", authenticated(apiGroupReorderHandler, false)).Methods("POST")
 
 	// API SERVICE Routes
-	api.Handle("/api/services", scoped(apiAllServicesHandler)).Methods("GET")
+	api.Handle("/api/services", scoped(apiAllServicesHandler)).Methods("GET") // support to only allow get services from specific group
 	api.Handle("/api/services", authenticated(apiCreateServiceHandler, false)).Methods("POST")
-	api.Handle("/api/services/{id}", scoped(apiServiceHandler)).Methods("GET")
+	api.Handle("/api/services/{id}", scoped(apiServiceHandler)).Methods("GET") // 1
 	api.Handle("/api/reorder/services", authenticated(reorderServiceHandler, false)).Methods("POST")
 	api.Handle("/api/services/{id}", authenticated(apiServiceUpdateHandler, false)).Methods("POST")
 	api.Handle("/api/services/{id}", authenticated(apiServicePatchHandler, false)).Methods("PATCH")
 	api.Handle("/api/services/{id}", authenticated(apiServiceDeleteHandler, false)).Methods("DELETE")
-	api.Handle("/api/services/{id}/failures", scoped(apiServiceFailuresHandler)).Methods("GET")
+	api.Handle("/api/services/{id}/failures", scoped(apiServiceFailuresHandler)).Methods("GET") // 2
 	api.Handle("/api/services/{id}/failures", authenticated(servicesDeleteFailuresHandler, false)).Methods("DELETE")
-	api.Handle("/api/services/{id}/hits", scoped(apiServiceHitsHandler)).Methods("GET")
+	api.Handle("/api/services/{id}/hits", scoped(apiServiceHitsHandler)).Methods("GET") // 3.
 	api.Handle("/api/services/{id}/hits", authenticated(apiServiceHitsDeleteHandler, false)).Methods("DELETE")
 
 	// API SERVICE CHART DATA Routes
-	api.Handle("/api/services/{id}/hits_data", http.HandlerFunc(apiServiceDataHandler)).Methods("GET")
-	api.Handle("/api/services/{id}/failure_data", http.HandlerFunc(apiServiceFailureDataHandler)).Methods("GET")
-	api.Handle("/api/services/{id}/ping_data", http.HandlerFunc(apiServicePingDataHandler)).Methods("GET")
-	api.Handle("/api/services/{id}/uptime_data", http.HandlerFunc(apiServiceTimeDataHandler)).Methods("GET")
+	api.Handle("/api/services/{id}/hits_data", http.HandlerFunc(apiServiceDataHandler)).Methods("GET")           // 4.
+	api.Handle("/api/services/{id}/failure_data", http.HandlerFunc(apiServiceFailureDataHandler)).Methods("GET") // 5.
+	api.Handle("/api/services/{id}/ping_data", http.HandlerFunc(apiServicePingDataHandler)).Methods("GET")       // 6.
+	api.Handle("/api/services/{id}/uptime_data", http.HandlerFunc(apiServiceTimeDataHandler)).Methods("GET")     // 7.
 
 	// API INCIDENTS Routes
-	api.Handle("/api/services/{id}/incidents", http.HandlerFunc(apiServiceIncidentsHandler)).Methods("GET")
+	api.Handle("/api/services/{id}/incidents", http.HandlerFunc(apiServiceIncidentsHandler)).Methods("GET") // 8.
 	api.Handle("/api/services/{id}/incidents", authenticated(apiCreateIncidentHandler, false)).Methods("POST")
 	api.Handle("/api/incidents/{id}", authenticated(apiIncidentUpdateHandler, false)).Methods("POST")
 	api.Handle("/api/incidents/{id}", authenticated(apiDeleteIncidentHandler, false)).Methods("DELETE")

@@ -37,11 +37,21 @@ class Api {
   }
 
   async services() {
-    return axios.get('api/services').then(response => (response.data))
+    return axios.get('api/services', {
+      params: {
+        // get group from query
+        group_name: new URLSearchParams(window.location.search).get('group')
+      }
+    }).then(response => (response.data))
   }
 
   async service(id) {
-    return axios.get('api/services/' + id).then(response => (response.data))
+    return axios.get('api/services/' + id, {
+      params: {
+        // get group from query
+        group_name: new URLSearchParams(window.location.search).get('group')
+      }
+    }).then(response => (response.data))
   }
 
   async service_create(data) {
@@ -53,15 +63,18 @@ class Api {
   }
 
   async service_hits(id, start, end, group, fill = true) {
-    return axios.get('api/services/' + id + '/hits_data?start=' + start + '&end=' + end + '&group=' + group + '&fill=' + fill).then(response => (response.data))
+    const group_name = new URLSearchParams(window.location.search).get('group')
+    return axios.get('api/services/' + id + '/hits_data?start=' + start + '&end=' + end + '&group=' + group + '&fill=' + fill+'&group_name='+group_name).then(response => (response.data))
   }
 
   async service_ping(id, start, end, group, fill = true) {
-    return axios.get('api/services/' + id + '/ping_data?start=' + start + '&end=' + end + '&group=' + group + '&fill=' + fill).then(response => (response.data))
+    const group_name = new URLSearchParams(window.location.search).get('group')
+    return axios.get('api/services/' + id + '/ping_data?start=' + start + '&end=' + end + '&group=' + group + '&fill=' + fill+'&group_name='+group_name).then(response => (response.data))
   }
 
   async service_failures_data(id, start, end, group, fill = true) {
-    return axios.get('api/services/' + id + '/failure_data?start=' + start + '&end=' + end + '&group=' + group + '&fill=' + fill).then(response => (response.data))
+    const group_name = new URLSearchParams(window.location.search).get('group')
+    return axios.get('api/services/' + id + '/failure_data?start=' + start + '&end=' + end + '&group=' + group + '&fill=' + fill+'&group_name='+group_name).then(response => (response.data))
   }
 
   async service_uptime(id, start, end) {
@@ -73,7 +86,8 @@ class Api {
   }
 
   async service_failures(id, start, end, limit = 999, offset = 0) {
-    return axios.get('api/services/' + id + '/failures?start=' + start + '&end=' + end + '&limit=' + limit + '&offset=' + offset).then(response => (response.data))
+    const group = new URLSearchParams(window.location.search).get('group')
+    return axios.get('api/services/' + id + '/failures?start=' + start + '&end=' + end + '&limit=' + limit + '&offset=' + offset +'&group_name='+group).then(response => (response.data))
   }
 
   async service_failures_delete(service) {

@@ -1,14 +1,17 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/gorilla/mux"
+
 	"github.com/statping-ng/statping-ng/database"
 	"github.com/statping-ng/statping-ng/types/errors"
 	"github.com/statping-ng/statping-ng/types/failures"
+	"github.com/statping-ng/statping-ng/types/groups"
 	"github.com/statping-ng/statping-ng/types/hits"
 	"github.com/statping-ng/statping-ng/types/services"
 	"github.com/statping-ng/statping-ng/utils"
-	"net/http"
 )
 
 type serviceOrder struct {
@@ -16,17 +19,40 @@ type serviceOrder struct {
 	Order int   `json:"order"`
 }
 
+func isBelongToGroup(r *http.Request, service *services.Service) bool {
+	isUser := IsUser(r)
+	groupName := r.URL.Query().Get("group_name")
+	if isUser {
+		return true
+	}
+
+	group, err := groups.FindByName(groupName)
+	if err != nil {
+		return false
+	}
+
+	if int64(service.GroupId) != group.Id {
+		return false
+	}
+	return true
+}
+
 func findService(r *http.Request) (*services.Service, error) {
 	vars := mux.Vars(r)
 	id := utils.ToInt(vars["id"])
-	servicer, err := services.Find(id)
+	service, err := services.Find(id)
 	if err != nil {
 		return nil, err
 	}
-	if !servicer.Public.Bool && !IsReadAuthenticated(r) {
+
+	if !isBelongToGroup(r, service) {
 		return nil, errors.NotAuthenticated
 	}
-	return servicer, nil
+
+	if !service.Public.Bool && !IsReadAuthenticated(r) {
+		return nil, errors.NotAuthenticated
+	}
+	return service, nil
 }
 
 func reorderServiceHandler(w http.ResponseWriter, r *http.Request) {
@@ -139,6 +165,11 @@ func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !isBelongToGroup(r, service) {
+		sendErrorJson(errors.NotAuthenticated, w, r)
+		return
+	}
+
 	groupQuery, err := database.ParseQueries(r, service.AllHits())
 	if err != nil {
 		sendErrorJson(err, w, r)
@@ -157,6 +188,11 @@ func apiServiceFailureDataHandler(w http.ResponseWriter, r *http.Request) {
 	service, err := findService(r)
 	if err != nil {
 		sendErrorJson(err, w, r)
+		return
+	}
+
+	if !isBelongToGroup(r, service) {
+		sendErrorJson(errors.NotAuthenticated, w, r)
 		return
 	}
 
@@ -182,6 +218,11 @@ func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !isBelongToGroup(r, service) {
+		sendErrorJson(errors.NotAuthenticated, w, r)
+		return
+	}
+
 	groupQuery, err := database.ParseQueries(r, service.AllHits())
 	if err != nil {
 		sendErrorJson(err, w, r)
@@ -201,6 +242,11 @@ func apiServiceTimeDataHandler(w http.ResponseWriter, r *http.Request) {
 	service, err := findService(r)
 	if err != nil {
 		sendErrorJson(err, w, r)
+		return
+	}
+
+	if !isBelongToGroup(r, service) {
+		sendErrorJson(errors.NotAuthenticated, w, r)
 		return
 	}
 
@@ -267,9 +313,32 @@ func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiAllServicesHandler(r *http.Request) interface{} {
+	isUser := IsUser(r)
+
+	if isUser {
+		var srvs []services.Service
+		for _, v := range services.AllInOrder() {
+			srvs = append(srvs, v)
+		}
+		return srvs
+	}
+
+	// get group from query
+	group := r.URL.Query().Get("group_name")
+
+	if group == "" {
+		return make([]services.Service, 0)
+	}
+
+	gr, err := groups.FindByName(group)
+	if err != nil {
+		log.Errorf("Failed to find group %s: %v", group, err)
+		return make([]services.Service, 0)
+	}
+
 	var srvs []services.Service
-	for _, v := range services.AllInOrder() {
-		if !v.Public.Bool && !IsUser(r) {
+	for _, v := range services.AllInGroupOrder(int(gr.Id)) {
+		if !v.Public.Bool {
 			continue
 		}
 		srvs = append(srvs, v)
@@ -295,6 +364,11 @@ func apiServiceFailuresHandler(r *http.Request) interface{} {
 	if err != nil {
 		return err
 	}
+
+	if !isBelongToGroup(r, service) {
+		return errors.NotAuthenticated
+	}
+
 	var fails []*failures.Failure
 	query, err := database.ParseQueries(r, service.AllFailures())
 	if err != nil {
@@ -309,6 +383,11 @@ func apiServiceHitsHandler(r *http.Request) interface{} {
 	if err != nil {
 		return err
 	}
+
+	if !isBelongToGroup(r, service) {
+		return errors.NotAuthenticated
+	}
+
 	var hts []*hits.Hit
 	query, err := database.ParseQueries(r, service.AllHits())
 	if err != nil {

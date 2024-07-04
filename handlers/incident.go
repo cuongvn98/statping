@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/gorilla/mux"
+
 	"github.com/statping-ng/statping-ng/types/errors"
 	"github.com/statping-ng/statping-ng/types/incidents"
 	"github.com/statping-ng/statping-ng/utils"
-	"net/http"
 )
 
 func findIncident(r *http.Request) (*incidents.Incident, int64, error) {
@@ -30,6 +32,12 @@ func apiServiceIncidentsHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
+
+	if !isBelongToGroup(r, service) {
+		sendErrorJson(errors.NotAuthenticated, w, r)
+		return
+	}
+
 	returnJson(service.Incidents, w, r)
 }
 
@@ -39,6 +47,7 @@ func apiIncidentUpdatesHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
+
 	returnJson(incid.Updates, w, r)
 }
 

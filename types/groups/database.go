@@ -1,11 +1,12 @@
 package groups
 
 import (
+	"sort"
+
 	"github.com/statping-ng/statping-ng/database"
 	"github.com/statping-ng/statping-ng/types/errors"
 	"github.com/statping-ng/statping-ng/types/metrics"
 	"github.com/statping-ng/statping-ng/utils"
-	"sort"
 )
 
 var (
@@ -53,6 +54,15 @@ func Find(id int64) (*Group, error) {
 	q := db.Where("id = ?", id).Find(&group)
 	if q.Error() != nil {
 		return nil, errors.Missing(group, id)
+	}
+	return &group, q.Error()
+}
+
+func FindByName(name string) (*Group, error) {
+	var group Group
+	q := db.Where("name = ?", name).Find(&group)
+	if q.Error() != nil {
+		return nil, errors.Missing(group, name)
 	}
 	return &group, q.Error()
 }

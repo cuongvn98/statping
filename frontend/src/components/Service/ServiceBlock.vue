@@ -181,7 +181,7 @@ export default {
       },
       async setService() {
         await this.$store.commit('setService', this.service)
-        this.$router.push('/service/'+this.service.id, {props: {service: this.service}})
+        this.$router.push('/service/'+this.service.id + '?group=' + new URLSearchParams(window.location.search).get('group'), {props: {service: this.service}})
       },
         visibleChart(isVisible, entry) {
                 if (isVisible && !this.visible) {
