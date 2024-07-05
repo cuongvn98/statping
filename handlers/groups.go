@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/gorilla/mux"
+
 	"github.com/statping-ng/statping-ng/types/errors"
 	"github.com/statping-ng/statping-ng/types/groups"
 	"github.com/statping-ng/statping-ng/utils"
-	"net/http"
 )
 
 func findGroup(r *http.Request) (*groups.Group, error) {
@@ -27,6 +29,19 @@ func findGroup(r *http.Request) (*groups.Group, error) {
 	return g, nil
 }
 
+func findGroupByName(r *http.Request) (*groups.Group, error) {
+	vars := mux.Vars(r)
+	name := vars["name"]
+	g, err := groups.FindByName(name)
+	if err != nil {
+		return nil, err
+	}
+	if !g.Public.Bool && !IsReadAuthenticated(r) {
+		return nil, errors.NotAuthenticated
+	}
+	return g, nil
+}
+
 // apiAllGroupHandler will show all the groups
 func apiAllGroupHandler(r *http.Request) interface{} {
 	auth, admin := IsUser(r), IsAdmin(r)
@@ -36,6 +51,16 @@ func apiAllGroupHandler(r *http.Request) interface{} {
 // apiGroupHandler will show a single group
 func apiGroupHandler(w http.ResponseWriter, r *http.Request) {
 	group, err := findGroup(r)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	returnJson(group, w, r)
+}
+
+// apiGroupNameHandler will show a single group
+func apiGroupNameHandler(w http.ResponseWriter, r *http.Request) {
+	group, err := findGroupByName(r)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
