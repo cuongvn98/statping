@@ -316,8 +316,14 @@ func apiAllServicesHandler(r *http.Request) interface{} {
 	isUser := IsUser(r)
 
 	if isUser {
-		var srvs []services.Service
-		for _, v := range services.AllInOrder() {
+		var (
+			srvs  []services.Service
+			limit = int64(10)
+		)
+
+		page := utils.ToInt(r.URL.Query().Get("page"))
+
+		for _, v := range services.AllInOrderWithLimit(limit, page*limit) {
 			srvs = append(srvs, v)
 		}
 		return srvs

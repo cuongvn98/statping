@@ -9,6 +9,7 @@
         <thead>
         <tr>
             <th scope="col">{{$t('name')}}</th>
+            <th scope="col" class="d-none d-md-table-cell">{{$t('average_response')}}</th>
             <th scope="col" class="d-none d-md-table-cell">{{$t('status')}}</th>
             <th scope="col" class="d-none d-md-table-cell">{{$t('visibility')}}</th>
             <th scope="col" class="d-none d-md-table-cell">{{ $t('group') }}</th>
@@ -31,6 +32,11 @@
                         <font-awesome-icon icon="bars" class="mr-3"/>
                     </span> {{service.name}}
                 </td>
+              <td class="d-none d-md-table-cell">
+                    <span>
+                       {{humanTime(service.avg_response)}}
+                    </span>
+              </td>
               <td class="d-none d-md-table-cell">
                     <span class="badge text-uppercase" :class="{'badge-success': service.online, 'badge-danger': !service.online}">
                         {{service.online ? $t('online') : $t('offline')}}

@@ -164,7 +164,7 @@ export default Vue.mixin({
         return `/service/0`
       }
       let link = service.permalink ? service.permalink : service.id
-      return `/service/${link}`
+      return `/service/${link}?group=${new URLSearchParams(window.location.search).get('group')}`
     },
     isEmptyObject(obj) {
       return Object.keys(obj).length === 0 && obj.constructor === Object

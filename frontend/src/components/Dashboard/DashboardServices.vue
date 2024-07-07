@@ -6,6 +6,12 @@
                 <router-link v-if="$store.state.admin" to="/dashboard/create_service" class="btn btn-sm btn-success float-right">
                     <font-awesome-icon icon="plus"/>  {{$t('create')}}
                 </router-link>
+                <button  class="btn btn-sm btn-outline-primary float-right" @click.prevent="nextServicePage">
+                  <font-awesome-icon icon="forward" />
+                </button>
+                <button  class="btn btn-sm btn-outline-primary float-right" @click.prevent="previousServicePage">
+                  <font-awesome-icon icon="backward" />
+                </button>
             </div>
             <div class="card-body pt-0">
                 <ServicesList/>
@@ -13,7 +19,14 @@
         </div>
 
         <div class="card contain-card mb-4">
-            <div class="card-header">{{ $t('groups') }}</div>
+            <div class="card-header">{{ $t('groups') }}
+              <button  class="btn btn-sm btn-outline-primary float-right" @click.prevent="nextGroupPage">
+                <font-awesome-icon icon="forward" />
+              </button>
+              <button  class="btn btn-sm btn-outline-primary float-right" @click.prevent="previousGroupPage">
+                <font-awesome-icon icon="backward" />
+              </button>
+            </div>
             <div class="card-body pt-0">
 
                 <div v-if="groupsList.length === 0">
@@ -133,7 +146,19 @@
               func: () => this.delete(g),
             }
             this.$store.commit("setModal", modal)
-          }
+          },
+        nextServicePage() {
+          this.$store.dispatch('nextPageService')
+        },
+        previousServicePage() {
+          this.$store.dispatch('prevPageService')
+        },
+        nextGroupPage() {
+          this.$store.dispatch('nextPageGroup')
+        },
+        previousGroupPage() {
+          this.$store.dispatch('prevPageGroup')
+        }
       }
   }
 </script>

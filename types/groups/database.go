@@ -73,6 +73,12 @@ func All() []*Group {
 	return groups
 }
 
+func AllWith(limit, offset int64) []*Group {
+	var groups []*Group
+	db.Limit(int(limit)).Offset(int(offset)).Find(&groups)
+	return groups
+}
+
 func (g *Group) Create() error {
 	q := db.Create(g)
 	return q.Error()
@@ -93,6 +99,29 @@ func SelectGroups(includeAll bool, auth bool) []*Group {
 	var validGroups []*Group
 
 	all := All()
+	if includeAll {
+		sort.Sort(GroupOrder(all))
+		return all
+	}
+
+	for _, g := range all {
+		if !g.Public.Bool {
+			if auth {
+				validGroups = append(validGroups, g)
+			}
+		} else {
+			validGroups = append(validGroups, g)
+		}
+	}
+	sort.Sort(GroupOrder(validGroups))
+	return validGroups
+}
+
+// SelectGroupsWith returns all groups
+func SelectGroupsWith(limit, offset int64, includeAll bool, auth bool) []*Group {
+	var validGroups []*Group
+
+	all := AllWith(limit, offset)
 	if includeAll {
 		sort.Sort(GroupOrder(all))
 		return all

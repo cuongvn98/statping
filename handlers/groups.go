@@ -45,7 +45,10 @@ func findGroupByName(r *http.Request) (*groups.Group, error) {
 // apiAllGroupHandler will show all the groups
 func apiAllGroupHandler(r *http.Request) interface{} {
 	auth, admin := IsUser(r), IsAdmin(r)
-	return groups.SelectGroups(admin, auth)
+	limit := int64(10)
+	offset := utils.ToInt(r.URL.Query().Get("page")) * limit
+
+	return groups.SelectGroupsWith(limit, offset, admin, auth)
 }
 
 // apiGroupHandler will show a single group

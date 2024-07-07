@@ -14,28 +14,37 @@ import (
 	"strings"
 	"time"
 
+	"github.com/alitto/pond"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/statping-ng/statping-ng/types/metrics"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
+	"github.com/statping-ng/statping-ng/types/metrics"
+
 	"github.com/emersion/go-imap/client"
+	healthpb "google.golang.org/grpc/health/grpc_health_v1"
+
 	"github.com/statping-ng/statping-ng/types/failures"
 	"github.com/statping-ng/statping-ng/types/hits"
 	"github.com/statping-ng/statping-ng/utils"
-	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
 
-// checkServices will start the checking go routine for each service
+var (
+	pool = pond.New(20, 50)
+)
+
+// CheckServices will start the checking go routine for each service
 func CheckServices() {
 	log.Infoln(fmt.Sprintf("Starting monitoring process for %v Services", len(allServices)))
-	for _, s := range allServices {
-		time.Sleep(50 * time.Millisecond)
+
+	for i := range allServices {
+		s := allServices[i]
+
 		go ServiceCheckQueue(s, true)
 	}
 }
 
-// CheckQueue is the main go routine for checking a service
+// ServiceCheckQueue is the main go routine for checking a service
 func ServiceCheckQueue(s *Service, record bool) {
 	s.Start()
 	s.Checkpoint = utils.Now()
@@ -48,15 +57,21 @@ CheckLoop:
 			log.Infoln(fmt.Sprintf("Stopping service: %v", s.Name))
 			break CheckLoop
 		case <-time.After(s.SleepDuration):
-			s.CheckService(record)
-			s.UpdateStats()
-			s.Checkpoint = s.Checkpoint.Add(s.Duration())
-			if !s.Online {
-				s.SleepDuration = s.Duration()
-			} else {
-				s.SleepDuration = s.Checkpoint.Sub(time.Now())
+			if !s.LastOnline.IsZero() && time.Since(s.LastOnline) >= 24*time.Hour {
+				break CheckLoop
 			}
+			pool.SubmitAndWait(serviceCheck(s, record))
 		}
+	}
+}
+
+func serviceCheck(s *Service, record bool) func() {
+	return func() {
+		s.CheckService(record)
+		s.UpdateStats()
+
+		s.Checkpoint = s.Checkpoint.Add(s.Duration())
+		s.SleepDuration = s.Duration()
 	}
 }
 
@@ -634,8 +649,8 @@ func RecordSuccess(s *Service) {
 	if err := hit.Create(); err != nil {
 		log.Error(err)
 	}
-	log.WithFields(utils.ToFields(hit, s)).Infoln(
-		fmt.Sprintf("Service #%d '%v' Successful Response: %s | Lookup in: %s | Online: %v | Interval: %d seconds", s.Id, s.Name, humanMicro(hit.Latency), humanMicro(hit.PingTime), s.Online, s.Interval))
+	// log.WithFields(utils.ToFields(hit, s)).Infoln(
+	// 	fmt.Sprintf("Service #%d '%v' Successful Response: %s | Lookup in: %s | Online: %v | Interval: %d seconds", s.Id, s.Name, humanMicro(hit.Latency), humanMicro(hit.PingTime), s.Online, s.Interval))
 	s.LastLookupTime = hit.PingTime
 	s.LastLatency = hit.Latency
 	metrics.Gauge("online", 1., s.Name, s.Type)

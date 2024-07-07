@@ -32,6 +32,8 @@ export default new Vuex.Store({
     admin: false,
     user: false,
     loggedIn: false,
+    servicePage: 0,
+    groupPage: 0,
     modal: {
       visible: false,
       title: "Modal Header",
@@ -152,6 +154,22 @@ export default new Vuex.Store({
     setModal(state, modal) {
       state.modal = modal
     },
+    nextPageService(state) {
+      state.servicePage += 1
+    },
+    nextPageGroup(state) {
+      state.groupPage += 1
+    },
+    prevPageService(state) {
+      if (state.servicePage > 0) {
+        state.servicePage -= 1
+      }
+    },
+    prevPageGroup(state) {
+      if (state.groupPage > 0) {
+        state.groupPage -= 1
+      }
+    }
   },
   actions: {
     async getAllServices(context) {
@@ -193,6 +211,26 @@ export default new Vuex.Store({
       context.commit("setUsers", users);
       const oauth = await Api.oauth()
       context.commit("setOAuth", oauth);
-    }
+    },
+    async nextPageService(context) {
+      context.commit("nextPageService")
+      const services = await Api.services(context.state.servicePage)
+      context.commit("setServices", services);
+    },
+    async prevPageService(context) {
+      context.commit("prevPageService")
+      const services = await Api.services(context.state.servicePage)
+      context.commit("setServices", services);
+    },
+    async nextPageGroup(context) {
+      context.commit("nextPageGroup")
+      const groups = await Api.groups(context.state.groupPage)
+      context.commit("setGroups", groups);
+    },
+    async prevPageGroup(context) {
+      context.commit("prevPageGroup")
+      const groups = await Api.groups(context.state.groupPage)
+      context.commit("setGroups", groups);
+    },
   }
 });

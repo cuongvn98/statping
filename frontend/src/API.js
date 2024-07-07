@@ -36,11 +36,12 @@ class Api {
     return axios.post('api/setup', qs.stringify(data)).then(response => (response.data))
   }
 
-  async services() {
+  async services(page = 0) {
     return axios.get('api/services', {
       params: {
         // get group from query
-        group_name: new URLSearchParams(window.location.search).get('group')
+        group_name: new URLSearchParams(window.location.search).get('group'),
+        page,
       }
     }).then(response => (response.data))
   }
@@ -106,8 +107,12 @@ class Api {
     return axios.get('api/checkins').then(response => (response.data))
   }
 
-  async groups() {
-    return axios.get('api/groups').then(response => (response.data))
+  async groups(page =0) {
+    return axios.get('api/groups', {
+        params: {
+            page
+        }
+    }).then(response => (response.data))
   }
 
   async groups_reorder(data) {

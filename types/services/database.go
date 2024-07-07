@@ -98,6 +98,26 @@ func AllInOrder() []Service {
 	return services
 }
 
+func AllInOrderWithLimit(limit, offset int64) []Service {
+	var services []Service
+	for _, service := range allServices {
+		if offset > 0 {
+			offset--
+			continue
+		}
+
+		service.UpdateStats()
+		services = append(services, *service)
+
+		limit--
+		if limit == 0 {
+			break
+		}
+	}
+	sort.Sort(ServiceOrder(services))
+	return services
+}
+
 func AllInGroupOrder(groupID int) []Service {
 	var services []Service
 	for _, service := range allServices {

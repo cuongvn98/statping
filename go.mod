@@ -33,6 +33,8 @@ require (
 	gopkg.in/yaml.v2 v2.3.0
 )
 
+require github.com/alitto/pond v1.9.0
+
 require (
 	cloud.google.com/go v0.56.0 // indirect
 	github.com/Azure/azure-sdk-for-go v41.3.0+incompatible // indirect
