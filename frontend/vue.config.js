@@ -10,7 +10,7 @@ module.exports = {
     proxy: {
       '/api': {
         logLevel: 'debug',
-        target: 'http://0.0.0.0:8585',
+        target: 'http://uptime.000nethost.com/api',
         changeOrigin: true,
         pathRewrite: {
           '^/api': ''

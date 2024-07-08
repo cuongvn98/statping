@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <router-view/>
-    <Footer v-if="$route.path !== '/setup'"/>
+    <Footer v-if="$route.path !== '/setup' && $route.path !== '/blank'"/>
   </div>
 </template>
 
