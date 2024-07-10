@@ -30,7 +30,7 @@ import (
 )
 
 var (
-	pool = pond.New(20, 50)
+	pool = pond.New(10, 20)
 )
 
 // CheckServices will start the checking go routine for each service

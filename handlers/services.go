@@ -318,7 +318,7 @@ func apiAllServicesHandler(r *http.Request) interface{} {
 	if isUser {
 		var (
 			srvs  []services.Service
-			limit = int64(10)
+			limit = int64(100)
 		)
 
 		page := utils.ToInt(r.URL.Query().Get("page"))
