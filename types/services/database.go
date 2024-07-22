@@ -106,7 +106,6 @@ func AllInOrderWithLimit(limit, offset int64) []Service {
 			continue
 		}
 
-		service.UpdateStats()
 		services = append(services, *service)
 
 		limit--
